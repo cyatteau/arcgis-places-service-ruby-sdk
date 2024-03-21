@@ -1,0 +1,315 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearby Places Finder in Ruby</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/calcite-components/1.0.0-beta.65/calcite.css">
+    <script type="module" src="https://js.arcgis.com/calcite-components/1.0.0-beta.65/calcite.esm.js"></script>
+    <script nomodule src="https://js.arcgis.com/calcite-components/1.0.0-beta.65/calcite.js"></script>
+    <style>
+      body { 
+        font-family: 'Raleway', 'Avenir Next', Avenir, 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+        background: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+      .container { 
+        max-width: 1300px;
+        background: #ffffff;
+        box-shadow: 0 2px 7px rgba(0,0,0,0.2);
+        padding: 20px;
+        border-radius: 8px;
+        margin: 0 auto;
+      }
+      .summary { 
+        display: flex; 
+        justify-content: space-between; 
+        padding-bottom: 20px; 
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 20px;
+        font-size: 16px;
+      }
+      table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        margin: 0 auto; 
+        font-size: 17px;
+      }
+      th, td { 
+        padding: 12px; 
+        border-bottom: 1px solid #ddd; 
+        text-align: left; 
+      }
+      th { 
+        background-color: #007ac2; 
+        color: #ffffff;
+      }
+      tr:hover {
+        background-color: #f5f5f5;
+      }
+      .checkbox-column { 
+        width: 20px; 
+      }
+      .chip { 
+        margin: 2px; 
+        cursor: pointer; 
+        user-select: none;
+      }
+      .chip:hover {
+        background-color: #007bff;
+        color: white;
+      }
+      .button-group { 
+        text-align: right; 
+        margin-bottom: 20px; 
+      }
+      calcite-button { 
+        margin-left: 10px; 
+      }
+      h1 {
+        font-size: 33px;
+        text-align: center;
+        padding-bottom: 2px;
+      }
+    </style>
+    </head>
+    <body>
+    <calcite-shell>
+      <calcite-header>
+        <h1 slot="header-content">Nearby Places Finder in Ruby</h1>
+      </calcite-header>
+      <div class="container">
+        <div class="button-group">
+          <calcite-button id="check-all-btn" appearance="solid">Check All</calcite-button>
+          <calcite-button id="uncheck-all-btn" appearance="solid">Uncheck All</calcite-button>
+        </div>
+        <div class="summary">
+          <div>Total places: <strong>30</strong></div>
+          <div id="selected-count">0 places selected</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Name</th>
+              <th>Categories</th>
+              <th>Distance (in meters)</th>
+            </tr>
+          </thead>
+      <tbody>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="First Palm Springs Villa Alejo"></td>
+          <td>First Palm Springs Villa Alejo</td>
+          <td><calcite-chip class='chip'>Residential Building</calcite-chip></td>
+          <td>93.8</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Angel View Resale Store"></td>
+          <td>Angel View Resale Store</td>
+          <td><calcite-chip class='chip'>Vintage and Thrift Store</calcite-chip></td>
+          <td>113.3</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Colony Palms Hotel"></td>
+          <td>Colony Palms Hotel</td>
+          <td><calcite-chip class='chip'>Hotel</calcite-chip></td>
+          <td>124.7</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Palm Canyon Theater"></td>
+          <td>Palm Canyon Theater</td>
+          <td><calcite-chip class='chip'>Music Venue</calcite-chip><calcite-chip class='chip'>Theater</calcite-chip></td>
+          <td>129.8</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Desert Art Center"></td>
+          <td>Desert Art Center</td>
+          <td><calcite-chip class='chip'>Art Gallery</calcite-chip></td>
+          <td>134.7</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="The Colony Club"></td>
+          <td>The Colony Club</td>
+          <td><calcite-chip class='chip'>New American Restaurant</calcite-chip></td>
+          <td>137.9</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Riccio's Steak & Seafood"></td>
+          <td>Riccio's Steak & Seafood</td>
+          <td><calcite-chip class='chip'>Seafood Restaurant</calcite-chip><calcite-chip class='chip'>Steakhouse</calcite-chip></td>
+          <td>161.3</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Corridor Shops"></td>
+          <td>Corridor Shops</td>
+          <td><calcite-chip class='chip'>Furniture and Home Store</calcite-chip></td>
+          <td>165.0</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Just Fabulous"></td>
+          <td>Just Fabulous</td>
+          <td><calcite-chip class='chip'>Gift Store</calcite-chip></td>
+          <td>165.0</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Palm Springs Koffi"></td>
+          <td>Palm Springs Koffi</td>
+          <td><calcite-chip class='chip'>Coffee Shop</calcite-chip><calcite-chip class='chip'>Restaurant</calcite-chip></td>
+          <td>167.0</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="First Palm Springs Villa Alejo"></td>
+          <td>First Palm Springs Villa Alejo</td>
+          <td><calcite-chip class='chip'>Residential Building</calcite-chip></td>
+          <td>93.8</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Angel View Resale Store"></td>
+          <td>Angel View Resale Store</td>
+          <td><calcite-chip class='chip'>Vintage and Thrift Store</calcite-chip></td>
+          <td>113.3</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Colony Palms Hotel"></td>
+          <td>Colony Palms Hotel</td>
+          <td><calcite-chip class='chip'>Hotel</calcite-chip></td>
+          <td>124.7</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Palm Canyon Theater"></td>
+          <td>Palm Canyon Theater</td>
+          <td><calcite-chip class='chip'>Music Venue</calcite-chip><calcite-chip class='chip'>Theater</calcite-chip></td>
+          <td>129.8</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Desert Art Center"></td>
+          <td>Desert Art Center</td>
+          <td><calcite-chip class='chip'>Art Gallery</calcite-chip></td>
+          <td>134.7</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="The Colony Club"></td>
+          <td>The Colony Club</td>
+          <td><calcite-chip class='chip'>New American Restaurant</calcite-chip></td>
+          <td>137.9</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Riccio's Steak & Seafood"></td>
+          <td>Riccio's Steak & Seafood</td>
+          <td><calcite-chip class='chip'>Seafood Restaurant</calcite-chip><calcite-chip class='chip'>Steakhouse</calcite-chip></td>
+          <td>161.3</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Corridor Shops"></td>
+          <td>Corridor Shops</td>
+          <td><calcite-chip class='chip'>Furniture and Home Store</calcite-chip></td>
+          <td>165.0</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Just Fabulous"></td>
+          <td>Just Fabulous</td>
+          <td><calcite-chip class='chip'>Gift Store</calcite-chip></td>
+          <td>165.0</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Palm Springs Koffi"></td>
+          <td>Palm Springs Koffi</td>
+          <td><calcite-chip class='chip'>Coffee Shop</calcite-chip><calcite-chip class='chip'>Restaurant</calcite-chip></td>
+          <td>167.0</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="First Palm Springs Villa Alejo"></td>
+          <td>First Palm Springs Villa Alejo</td>
+          <td><calcite-chip class='chip'>Residential Building</calcite-chip></td>
+          <td>93.8</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Angel View Resale Store"></td>
+          <td>Angel View Resale Store</td>
+          <td><calcite-chip class='chip'>Vintage and Thrift Store</calcite-chip></td>
+          <td>113.3</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Colony Palms Hotel"></td>
+          <td>Colony Palms Hotel</td>
+          <td><calcite-chip class='chip'>Hotel</calcite-chip></td>
+          <td>124.7</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Palm Canyon Theater"></td>
+          <td>Palm Canyon Theater</td>
+          <td><calcite-chip class='chip'>Music Venue</calcite-chip><calcite-chip class='chip'>Theater</calcite-chip></td>
+          <td>129.8</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Desert Art Center"></td>
+          <td>Desert Art Center</td>
+          <td><calcite-chip class='chip'>Art Gallery</calcite-chip></td>
+          <td>134.7</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="The Colony Club"></td>
+          <td>The Colony Club</td>
+          <td><calcite-chip class='chip'>New American Restaurant</calcite-chip></td>
+          <td>137.9</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Riccio's Steak & Seafood"></td>
+          <td>Riccio's Steak & Seafood</td>
+          <td><calcite-chip class='chip'>Seafood Restaurant</calcite-chip><calcite-chip class='chip'>Steakhouse</calcite-chip></td>
+          <td>161.3</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Corridor Shops"></td>
+          <td>Corridor Shops</td>
+          <td><calcite-chip class='chip'>Furniture and Home Store</calcite-chip></td>
+          <td>165.0</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Just Fabulous"></td>
+          <td>Just Fabulous</td>
+          <td><calcite-chip class='chip'>Gift Store</calcite-chip></td>
+          <td>165.0</td>
+        </tr>
+        <tr>
+          <td class="checkbox-column"><input type="checkbox" name="place" value="Palm Springs Koffi"></td>
+          <td>Palm Springs Koffi</td>
+          <td><calcite-chip class='chip'>Coffee Shop</calcite-chip><calcite-chip class='chip'>Restaurant</calcite-chip></td>
+          <td>167.0</td>
+        </tr>
+      </tbody>
+    </table>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var checkboxes = document.querySelectorAll('input[type="checkbox"][name="place"]');
+        var selectedCountDisplay = document.getElementById('selected-count');
+        var checkAllBtn = document.getElementById('check-all-btn');
+        var uncheckAllBtn = document.getElementById('uncheck-all-btn');
+        
+        checkboxes.forEach(function(checkbox) {
+          checkbox.addEventListener('change', function() {
+            var selectedCount = document.querySelectorAll('input[type="checkbox"][name="place"]:checked').length;
+            selectedCountDisplay.textContent = selectedCount + " places selected";
+          });
+        });
+
+        checkAllBtn.addEventListener('click', function() {
+          checkboxes.forEach(function(checkbox) {
+            checkbox.checked = true;
+          });
+          selectedCountDisplay.textContent = checkboxes.length + " places selected";
+        });
+
+        uncheckAllBtn.addEventListener('click', function() {
+          checkboxes.forEach(function(checkbox) {
+            checkbox.checked = false;
+          });
+          selectedCountDisplay.textContent = "0 places selected";
+        });
+      });
+    </script>
+  </div>
+</calcite-shell>
+</body>
+</html>

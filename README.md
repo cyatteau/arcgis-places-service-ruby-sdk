@@ -37,3 +37,6 @@ The included test script demonstrates the use of the nearby place search feature
     ruby test_script.rb
   
 After running the script, you should have an HTML file that lists all the restaurants found, demonstrating how to use the SDK to interact with the ArcGIS Places Service effectively.
+
+### Demo Clip
+![GIF-for-repo](https://github.com/cyatteau/arcgis-places-service-ruby-sdk/assets/112517097/a729726d-1dd7-4465-8228-32719a43913a)
